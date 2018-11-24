@@ -1,0 +1,68 @@
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+#include<cstdlib>
+#include<ctime>
+#include<functional>
+#include<cmath>
+#include<vector>
+#include<assert.h>
+//using namespace std;
+using std::min;
+using std::max;
+using std::swap;
+using std::sort;
+using std::reverse;
+using std::random_shuffle;
+using std::lower_bound;
+using std::upper_bound;
+using std::unique;
+using std::vector;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef double db;
+typedef std::pair<int,int> pii;
+typedef std::pair<ll,ll> pll;
+void open(const char *s){
+#ifndef ONLINE_JUDGE
+	char str[100];sprintf(str,"%s.in",s);freopen(str,"r",stdin);sprintf(str,"%s.out",s);freopen(str,"w",stdout);
+#endif
+}
+void open2(const char *s){
+#ifdef DEBUG
+	char str[100];sprintf(str,"%s.in",s);freopen(str,"r",stdin);sprintf(str,"%s.out",s);freopen(str,"w",stdout);
+#endif
+}
+int rd(){int s=0,c,b=0;while(((c=getchar())<'0'||c>'9')&&c!='-');if(c=='-'){c=getchar();b=1;}do{s=s*10+c-'0';}while((c=getchar())>='0'&&c<='9');return b?-s:s;}
+void put(int x){if(!x){putchar('0');return;}static int c[20];int t=0;while(x){c[++t]=x%10;x/=10;}while(t)putchar(c[t--]+'0');}
+int upmin(int &a,int b){if(b<a){a=b;return 1;}return 0;}
+int upmax(int &a,int b){if(b>a){a=b;return 1;}return 0;}
+const ll p=998244353;
+const int K=160;
+ll f[K];
+int a[100010];
+int n,k;
+int gao(int x)
+{
+	if(!x)
+		return 0;
+	return (x%k+gao(x/k))%k;
+}
+int main()
+{
+	freopen("c.in","r",stdin);
+	freopen("c2.out","w",stdout);
+	scanf("%d%d",&n,&k);
+	for(int i=0;i<n;i++)
+		a[i]=gao(i);
+	ll s=1;
+	for(int i=0;i<n;i++)
+	{
+		ll temp=f[a[i]];
+		f[a[i]]=s;
+		s=(2*s-temp)%p;
+	}
+	s=(s+p)%p;
+	printf("%lld\n",s);
+	return 0;
+}
