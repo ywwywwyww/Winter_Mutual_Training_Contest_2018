@@ -37,15 +37,16 @@ int rd(){int s=0,c,b=0;while(((c=getchar())<'0'||c>'9')&&c!='-');if(c=='-'){c=ge
 void put(int x){if(!x){putchar('0');return;}static int c[20];int t=0;while(x){c[++t]=x%10;x/=10;}while(t)putchar(c[t--]+'0');}
 int upmin(int &a,int b){if(b<a){a=b;return 1;}return 0;}
 int upmax(int &a,int b){if(b>a){a=b;return 1;}return 0;}
+const int N=500000;
+const ll p=998244353;
+ll fac[N],ifac[N],inv[N];
+ll binom(ll x,ll y)
+{
+	return x==y?1:(x>=y&&y>=0?fac[x]*ifac[y]%p*ifac[x-y]%p:0);
+}
 int main()
 {
-	freopen("b.in","w",stdout);
-	srand(time(0));
-	int n=10;
-//	printf("%d\n",n);
-	for(int i=1;i<=100000;i++)
-		rand();
-	for(int i=1;i<=n;i++)
-		putchar(rand()%2+'a');
+	open("c");
+	init();
 	return 0;
 }

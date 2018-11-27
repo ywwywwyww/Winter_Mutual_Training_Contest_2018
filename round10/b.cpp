@@ -39,13 +39,8 @@ int upmin(int &a,int b){if(b<a){a=b;return 1;}return 0;}
 int upmax(int &a,int b){if(b>a){a=b;return 1;}return 0;}
 int main()
 {
-	freopen("b.in","w",stdout);
-	srand(time(0));
-	int n=10;
-//	printf("%d\n",n);
-	for(int i=1;i<=100000;i++)
-		rand();
+	open("b");
+	scanf("%d%d",&n,&q);
 	for(int i=1;i<=n;i++)
-		putchar(rand()%2+'a');
-	return 0;
-}
+		scanf("%d",&a[i]);
+	
