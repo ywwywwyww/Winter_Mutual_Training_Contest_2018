@@ -56,13 +56,6 @@ namespace ntt
 	const int W=524288;
 	ll w[N];
 	int rev[N];
-	void init()
-	{
-		w[0]=1;
-		ll s=fp(3,(p-1)/W);
-		for(int i=1;i<W/2;i++)
-			w[i]=w[i-1]*s%p;
-	}
 	void ntt(ll *a,int n,int t)
 	{
 		for(int i=1;i<n;i++)
@@ -114,7 +107,6 @@ ll fac[N],ifac[N],inv[N];
 ll pw[N];
 void init()
 {
-	ntt::init();
 	fac[0]=fac[1]=ifac[0]=ifac[1]=inv[1]=1;
 	for(int i=2;i<=500000;i++)
 	{
@@ -141,53 +133,10 @@ ll *f1,*f2,*g1,*g2;
 int H,W;
 int n;
 int h[N],w[N],x1[N],y1[N],x2[N],y2[N];
-void gao1(ll *f,ll *g,int n,int m,int x,int y)
-{
-	static ll a1[N],a2[N],a3[N];
-	for(int i=0;i<=n;i++)
-		a1[i]=f[i]*ifac[x-i]%p;
-	for(int i=0;i<=n+m;i++)
-		a2[i]=fac[x+y+i-n];
-	ntt::mul(a1,a2,a3,n,n+m,n+m);
-	for(int i=0;i<=m;i++)
-		g[i]=(g[i]+a3[i+n]*ifac[y+i])%p;
-}
-void gao2(ll *f,ll *g,int n,int m,int x,int y)
-{
-	static ll a1[N],a2[N],a3[N];
-	for(int i=0;i<=n;i++)
-		a1[i]=f[i];
-	for(int i=0;i<=n+m;i++)
-		a2[i]=calc(x+i-n,y);
-	ntt::mul(a1,a2,a3,n,n+m,n+m);
-	for(int i=0;i<=m;i++)
-		g[i]=(g[i]+a3[i+n])%p;
-}
-void gao3(ll *f,ll *g,int n,int m)
-{
-	static ll a1[N],a2[N],a3[N];
-	for(int i=0;i<=n;i++)
-		a1[i]=f[i]*ifac[n-i]%p;
-	for(int i=0;i<=n+m;i++)
-		a2[i]=fac[n+i-n]*(pw[n+i-n+1]-1)%p;
-	ntt::mul(a1,a2,a3,n,n+m,n+m);
-	for(int i=0;i<=m;i++)
-		g[i]=(g[i]+a3[i+n]*ifac[i])%p;
-}
-void gao4(ll *f,ll *g,int n,int m)
-{
-	static ll a1[N],a2[N],a3[N];
-	for(int i=0;i<=n;i++)
-		a1[i]=f[i];
-	for(int i=0;i<=n;i++)
-		a2[i]=calc(i,m)*(pw[i+m+1]-1)%p;
-	ntt::mul(a1,a2,a3,n,n,n);
-	for(int i=0;i<=n;i++)
-		g[i]=(g[i]+a3[i])%p;
-}
 int main()
 {
-	open("c");
+	freopen("c.in","r",stdin);
+	freopen("c2.out","w",stdout);
 	scanf("%d%d",&H,&W);
 	init();
 	scanf("%d",&n);
@@ -212,32 +161,24 @@ int main()
 			g1[j]=0;
 		for(int j=0;j<w[i];j++)
 			g2[j]=0;
-			
-		gao1(f1,g1,w[i-1]-1,h[i]-1,y1[i]-y1[i-1]-1,x1[i]-x2[i-1]-1);
-		gao1(f2,g2,h[i-1]-1,w[i]-1,x1[i]-x1[i-1]-1,y1[i]-y2[i-1]-1);
 		
-//		for(int j=0;j<w[i-1];j++)
-//			for(int k=0;k<h[i];k++)
-//				g1[k]=(g1[k]+f1[j]*calc(x1[i]-x2[i-1]+k-1,y1[i]-y1[i-1]-j-1))%p;
-//		
-//		for(int j=0;j<h[i-1];j++)
-//			for(int k=0;k<w[i];k++)
-//				g2[k]=(g2[k]+f2[j]*calc(y1[i]-y2[i-1]+k-1,x1[i]-x1[i-1]-j-1))%p;
+		for(int j=0;j<w[i-1];j++)
+			for(int k=0;k<h[i];k++)
+				g1[k]=(g1[k]+f1[j]*calc(x1[i]-x2[i-1]+k-1,y1[i]-y1[i-1]-j-1))%p;
 		
+		for(int j=0;j<h[i-1];j++)
+			for(int k=0;k<w[i];k++)
+				g2[k]=(g2[k]+f2[j]*calc(y1[i]-y2[i-1]+k-1,x1[i]-x1[i-1]-j-1))%p;
+				
 		if(y2[i-1]+2<=y1[i])
-			gao2(f2,g1,h[i-1]-1,h[i]-1,x1[i]-x1[i-1],y1[i]-y2[i-1]-2);
-		if(x2[i-1]+2<=x1[i])
-			gao2(f1,g2,w[i-1]-1,w[i]-1,y1[i]-y1[i-1],x1[i]-x2[i-1]-2);
+			for(int j=0;j<h[i-1];j++)
+				for(int k=0;k<h[i];k++)
+					g1[k]=(g1[k]+f2[j]*calc(y1[i]-y2[i-1]-2,x1[i]-x1[i-1]+k-j))%p;
 		
-//		if(y2[i-1]+2<=y1[i])
-//			for(int j=0;j<h[i-1];j++)
-//				for(int k=0;k<h[i];k++)
-//					g1[k]=(g1[k]+f2[j]*calc(y1[i]-y2[i-1]-2,x1[i]-x1[i-1]+k-j))%p;
-//		
-//		if(x2[i-1]+2<=x1[i])
-//			for(int j=0;j<w[i-1];j++)
-//				for(int k=0;k<w[i];k++)
-//					g2[k]=(g2[k]+f1[j]*calc(x1[i]-x2[i-1]-2,y1[i]-y1[i-1]+k-j))%p;
+		if(x2[i-1]+2<=x1[i])
+			for(int j=0;j<w[i-1];j++)
+				for(int k=0;k<w[i];k++)
+					g2[k]=(g2[k]+f1[j]*calc(x1[i]-x2[i-1]-2,y1[i]-y1[i-1]+k-j))%p;
 		
 		if(i<=n)
 		{
@@ -247,28 +188,22 @@ int main()
 				f1[j]=0;
 			for(int j=0;j<h[i];j++)
 				f2[j]=0;
-				
-			gao3(g1,f1,h[i]-1,w[i]-1);
-			gao3(g2,f2,w[i]-1,h[i]-1);
 			
-//			for(int j=0;j<h[i];j++)
-//				for(int k=0;k<w[i];k++)
-//					f1[k]=(f1[k]+g1[j]*calc(h[i]-j-1,k)%p*(pw[h[i]-j-1+k+1]-1))%p;
-//			
-//			for(int j=0;j<w[i];j++)
-//				for(int k=0;k<h[i];k++)
-//					f2[k]=(f2[k]+g2[j]*calc(w[i]-j-1,k)%p*(pw[w[i]-j-1+k+1]-1))%p;
+			for(int j=0;j<h[i];j++)
+				for(int k=0;k<w[i];k++)
+					f1[k]=(f1[k]+g1[j]*calc(h[i]-j-1,k)%p*(pw[h[i]-j-1+k+1]-1))%p;
 			
-			gao4(g1,f2,h[i]-1,w[i]-1);
-			gao4(g2,f1,w[i]-1,h[i]-1);
+			for(int j=0;j<w[i];j++)
+				for(int k=0;k<h[i];k++)
+					f2[k]=(f2[k]+g2[j]*calc(w[i]-j-1,k)%p*(pw[w[i]-j-1+k+1]-1))%p;
 			
-//			for(int j=0;j<h[i];j++)
-//				for(int k=j;k<h[i];k++)
-//					f2[k]=(f2[k]+g1[j]*calc(k-j,w[i]-1)%p*(pw[k-j+w[i]-1+1]-1))%p;
-//			
-//			for(int j=0;j<w[i];j++)
-//				for(int k=j;k<w[i];k++)
-//					f1[k]=(f1[k]+g2[j]*calc(k-j,h[i]-1)%p*(pw[k-j+h[i]-1+1]-1))%p;
+			for(int j=0;j<h[i];j++)
+				for(int k=j;k<h[i];k++)
+					f2[k]=(f2[k]+g1[j]*calc(k-j,w[i]-1)%p*(pw[k-j+w[i]-1+1]-1))%p;
+			
+			for(int j=0;j<w[i];j++)
+				for(int k=j;k<w[i];k++)
+					f1[k]=(f1[k]+g2[j]*calc(k-j,h[i]-1)%p*(pw[k-j+h[i]-1+1]-1))%p;
 		}
 	}
 	

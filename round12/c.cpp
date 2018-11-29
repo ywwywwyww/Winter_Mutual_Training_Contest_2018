@@ -60,7 +60,7 @@ mat operator *(mat a,mat b)
 		{
 			__int128 s=0;
 			for(int l=1;l<=sz;l++)
-				s+=(__int128)a[i][l]*b[l][j];
+				s+=a[i][l]*b[l][j];
 			c[i][j]=s%p;
 		}
 	return c;
@@ -124,7 +124,25 @@ void gao(int x,int _x1,int _y1,int _z1)
 }
 ll calc(int x,int x1,int y,int y1,int z,int z1)
 {
-	return s[x+y+z+3*k][x1][y1][z1][-x][-y];
+	int _x=-x;
+	int _y=-y;
+	int _z=-z;
+	if(x1>y1)
+	{
+		swap(_x,_y);
+		swap(x1,y1);
+	}
+	if(x1>z1)
+	{
+		swap(_x,_z);
+		swap(x1,z1);
+	}
+	if(y1>z1)
+	{
+		swap(_y,_z);
+		swap(y1,z1);
+	}
+	return s[x+y+z+3*k][x1][y1][z1][_x][_y];
 }
 int main()
 {
@@ -132,10 +150,12 @@ int main()
 	scanf("%d%d%lld",&n,&k,&p);
 	sz=(k+1)*(k+1);
 	for(int i=-3*k;i<=0;i++)
-		for(int i1=0;i1<=1;i1++)
-			for(int j1=0;j1<=1;j1++)
-				for(int l1=0;l1<=1;l1++)
-					gao(i,i1,j1,l1);
+	{
+		gao(i,0,0,0);
+		gao(i,0,0,1);
+		gao(i,0,1,1);
+		gao(i,1,1,1);
+	}
 	ll ans=0;
 	for(int i=-k;i<=0;i++)
 		for(int j=-k;j<=0;j++)
