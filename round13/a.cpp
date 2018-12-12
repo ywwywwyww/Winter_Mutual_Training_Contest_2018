@@ -207,7 +207,7 @@ struct zjtakioi2019
 	{
 		st=w[x];
 		tot=len;
-		size=ceil(sqrt(len));
+		size=ceil(sqrt(len)/5);
 		num=(len+size-1)/size;
 		a=new block[num+1];
 		for(int i=1;i<=num;i++)
@@ -328,7 +328,9 @@ int main()
 	int op,x,y,v;
 	for(int i=1;i<n;i++)
 	{
-		scanf("%d%d",&x,&y);
+//		scanf("%d%d",&x,&y);
+		x=rd();
+		y=rd();
 		g[x].push_back(y);
 		g[y].push_back(x);
 	}
@@ -336,7 +338,8 @@ int main()
 	dfs2(1,1);
 	for(int i=1;i<=n;i++)
 	{
-		scanf("%d",&x);
+//		scanf("%d",&x);
+		x=rd();
 		a[w[i]]=x;
 	}
 	for(int i=1;i<=n;i++)
@@ -349,14 +352,19 @@ int main()
 		scanf("%d",&op);
 		if(op==1)
 		{
-			scanf("%d%d%d",&x,&y,&v);
+//			scanf("%d%d%d",&x,&y,&v);
+			x=rd();
+			y=rd();
+			v=rd();
 			x^=type*ans;
 			y^=type*ans;
 			modify(x,y,v);
 		}
 		else if(op==2)
 		{
-			scanf("%d%d",&x,&y);
+//			scanf("%d%d",&x,&y);
+			x=rd();
+			y=rd();
 			x^=type*ans;
 			y^=type*ans;
 			ans=chain_query(x,y);
@@ -364,7 +372,8 @@ int main()
 		}
 		else
 		{
-			scanf("%d",&x);
+//			scanf("%d",&x);
+			x=rd();
 			x^=type*ans;
 			ans=subtree_query(x);
 			printf("%d\n",ans);
