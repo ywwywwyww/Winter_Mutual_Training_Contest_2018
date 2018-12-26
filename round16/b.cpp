@@ -40,6 +40,14 @@ int upmax(int &a,int b){if(b>a){a=b;return 1;}return 0;}
 const ll p1=998244353;
 const int N=530000;
 const db pi=acos(-1);
+ll fp(ll a,ll b,ll p)
+{
+	ll s=1;
+	for(;b;b>>=1,a=a*a%p)
+		if(b&1)
+			s=s*a%p;
+	return s;
+}
 ll n,p,g;
 ll n1,n2;
 ll e1[N],e2[N];
@@ -164,8 +172,23 @@ namespace fft
 		for(int i=1;i<n;i++)
 			c[i]=0;
 		for(int i=0;i<=2*n-4;i++)
-			c[e1[i]%(n-1)]=(c[e1[i]%(n-1)]+a3[i])%p;
+			c[e1[i%(n-1)]]=(c[e1[i%(n-1)]]+a3[i])%p;
 	}
+}
+ll inv[N],fac[N],ifac[N];
+void init()
+{
+	inv[1]=fac[0]=fac[1]=ifac[0]=ifac[1]=1;
+	for(int i=2;i<p;i++)
+	{
+		inv[i]=(-p/i*inv[p%i]%p+p)%p;
+		fac[i]=fac[i-1]*i%p;
+		ifac[i]=ifac[i-1]*inv[i]%p;
+	}
+}
+ll binom(int x,int y)
+{
+	return x>=y&&y>=0?fac[x]*ifac[y]%p*ifac[x-y]%p:0;
 }
 int check()
 {
@@ -184,7 +207,7 @@ int check()
 }
 void getg()
 {
-	for(g=2;;g++)
+	for(g=1;;g++)
 		if(check())
 			break;
 	e1[0]=1;
@@ -193,17 +216,103 @@ void getg()
 	for(int i=0;i<p-1;i++)
 		e2[e1[i]]=i;
 }
+namespace gao1
+{
+	ll ans[N];
+	ll s[N];
+	void solve(int n)
+	{
+		if(!n)
+		{
+			s[0]=1;
+			return;
+		}
+		if(n&1)
+		{
+			solve(n-1);
+			for(int i=n-1;i>=0;i--)
+			{
+				s[i+1]=(s[i+1]+s[i])%p;
+				s[i]=s[i]*n%p;
+			}
+		}
+		else
+		{
+			solve(n>>1);
+			static ll a1[N],a2[N],a3[N];
+			for(int i=0;i<=n>>1;i++)
+			{
+				a1[i]=fp((n>>1),i,p)*ifac[i]%p;
+				a2[i]=s[i]*fac[i]%p;
+			}
+			reverse(a2,a2+(n>>1)+1);
+			fft::mul(a1,a2,a3,n>>1,n>>1,n>>1,p);
+			reverse(a3,a3+(n>>1)+1);
+			for(int i=0;i<=n>>1;i++)
+				a3[i]=a3[i]*ifac[i]%p;
+			fft::mul(s,a3,s,n>>1,n>>1,n,p);
+		}
+	}
+	void gao()
+	{
+		solve(n2);
+		for(int i=0;i<=n2;i++)
+			if(s[i])
+				ans[s[i]]++;
+	}
+}
+namespace gao2
+{
+	ll ans[N];
+	int a[N],t;
+	ll s[N];
+	int v[N];
+	void gao()
+	{
+		static ll a1[N],a2[N];
+		for(ll _=n1;_;)
+		{
+			a[++t]=_%p;
+			_/=p;
+		}
+		ans[1]=1;
+		for(int j=1;j<=t;j++)
+		{
+			v[j]=(p==2&&j>1?1:-1);
+			for(int i=0;i<p;i++)
+				a1[i]=0;
+			for(int i=0;i<=a[j];i++)
+				a1[(binom(a[j],i)*(i&1?v[j]:1)%p+p)%p]++;
+			fft::mul2(ans,a1,a2,p,p1);
+			for(int i=1;i<p;i++)
+				ans[i]=a2[i];
+		}
+	}
+}
+ll ans[N];
 int main()
 {
 	open("b");
 	fft::init();
 	scanf("%lld%lld",&n,&p);
+	init();
 	getg();
 	n1=n/p,n2=n%p;
 	if(n2==p-1)
 	{
 		n1++;
 		n2=0;
+	}
+	gao1::gao();
+	gao2::gao();
+	fft::mul2(gao1::ans,gao2::ans,ans,p,p1);
+	ans[0]=(n+1)%p1;
+	for(int i=1;i<p;i++)
+		ans[0]=(ans[0]-ans[i])%p1;
+	for(int i=0;i<p;i++)
+	{
+		ans[i]=(ans[i]+p1)%p1;
+		printf("%lld\n",ans[i]);
 	}
 	return 0;
 }
