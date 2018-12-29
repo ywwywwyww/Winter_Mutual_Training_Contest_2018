@@ -1,7 +1,6 @@
 #忽略对拍程序，暴力和数据生成器
 
-[^abc]*.cpp
-[abc]?*.cpp
+*.cpp
 
 #忽略其他文件
 
@@ -10,4 +9,8 @@
 *.out
 *.bat
 *.txt
+*.md
+
+![abc].cpp
+!summary.md
 
