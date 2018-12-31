@@ -1,3 +1,4 @@
+#pragma GCC optimize(2)
 #include<cstdio>
 #include<cstring>
 #include<algorithm>
@@ -21,6 +22,7 @@ using std::vector;
 typedef long long ll;
 typedef unsigned long long ull;
 typedef double db;
+typedef long double ldb;
 typedef std::pair<int,int> pii;
 typedef std::pair<ll,ll> pll;
 void open(const char *s){
@@ -37,7 +39,7 @@ int rd(){int s=0,c,b=0;while(((c=getchar())<'0'||c>'9')&&c!='-');if(c=='-'){c=ge
 void put(int x){if(!x){putchar('0');return;}static int c[20];int t=0;while(x){c[++t]=x%10;x/=10;}while(t)putchar(c[t--]+'0');}
 int upmin(int &a,int b){if(b<a){a=b;return 1;}return 0;}
 int upmax(int &a,int b){if(b>a){a=b;return 1;}return 0;}
-const int N=1200000;
+const int N=100000;
 const ll p=998244353;
 ll fp(ll a,ll b)
 {
@@ -49,9 +51,9 @@ ll fp(ll a,ll b)
 }
 namespace ntt
 {
-	const int W=1048576;
-	int rev[N];
+	const int W=65536;
 	ll w[N];
+	int rev[N];
 	void init()
 	{
 		ll s=fp(3,(p-1)/W);
@@ -105,48 +107,46 @@ namespace ntt
 			c[i]=a1[i];
 	}
 }
+ll f[60][60000];
+ll g[60][60000];
+int n,k;
 ll inv[N],fac[N],ifac[N];
-int n,m,k;
-ll f[N];
-ll a[N],b[N],c[N];
+ll c[N];
+ll s[N];
+void init()
+{
+	inv[1]=fac[0]=fac[1]=ifac[0]=ifac[1]=1;
+	for(int i=2;i<=60000;i++)
+	{
+		inv[i]=-p/i*inv[p%i]%p;
+		fac[i]=fac[i-1]*i%p;
+		ifac[i]=ifac[i-1]*inv[i]%p;
+	}
+}
 ll binom(int x,int y)
 {
 	return fac[x]*ifac[y]%p*ifac[x-y]%p;
 }
 int main()
 {
-	open("b");
+	open("a");
+	init();
 	ntt::init();
-	inv[1]=fac[0]=fac[1]=ifac[0]=ifac[1]=1;
-	for(int i=2;i<=500010;i++)
-	{
-		inv[i]=-p/i*inv[p%i]%p;
-		fac[i]=fac[i-1]*i%p;
-		ifac[i]=ifac[i-1]*inv[i]%p;
-	}
-	scanf("%d%d%d",&n,&m,&k);
-	
-	for(int i=0;i<=m+1;i++)
-	{
-		a[i]=(i&1?-1:1)*ifac[i]%p*ifac[m+1-i]%p;
-		b[i]=fp(i,m);
-	}
-	ntt::mul(a,b,c,m+1,m+1,m+1);
-	for(int i=0;i<m;i++)
-		f[i]=c[i+1]*fac[m+1]%p;
-	
-	
-	for(int i=0;i<m;i++)
-		f[i]=f[i]*ifac[m]%p;
-	for(int i=m-1;i>=0;i--)
-		f[i]=(f[i]+f[i+1])%p;
-	for(int i=0;i<m;i++)
-		f[i]=fp(f[i],n)%p;
-	for(int i=0;i<m;i++)
-		f[i]=(f[i]-f[i+1])%p;
+	scanf("%d%d",&n,&k);
+	f[0][0]=1;
+	for(int i=0;i<k;i++)
+		c[i]=ifac[i];
+	for(int i=1;i<=n;i++)
+		ntt::mul(f[i-1],c,f[i],(i-1)*(k-1),k-1,i*(k-1));
+	for(int i=1;i<=n;i++)
+		for(int j=k-1;j<=i*(k-1);j++)
+			g[i][j]=f[i-1][j-k+1]*ifac[k-1]%p*i%p;
+	for(int i=1;i<=n;i++)
+		for(int j=1;j<=n*k;j++)
+			s[i]=(s[i]+g[i][j-1]*fac[j-1]%p*fp(inv[i],j)%p*j%p*n%p*inv[i])%p;
 	ll ans=0;
-	for(int i=0;i<m;i++)
-		ans=(ans+fp(i,k)*f[i])%p;
+	for(int i=1;i<=n;i++)
+		ans=(ans+s[i]*binom(n,i)%p*((i+1)&1?-1:1))%p;
 	ans=(ans%p+p)%p;
 	printf("%lld\n",ans);
 	return 0;
